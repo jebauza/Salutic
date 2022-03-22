@@ -3,7 +3,9 @@
 namespace App;
 
 use App\Center;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -70,10 +72,82 @@ class User extends Authenticatable
         return $this->attributes[$this->activePasswordIndex()];
     }
 
+    // SCOPE
     /**
-     * Get the user that owns the User
+     * Method scopeCenters
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @param $query $query [explicite description]
+     * @param Array $centerIds [explicite description]
+     *
+     * @return void
+     */
+    public function scopeCenters($query, Array $centerIds = null)
+    {
+        if (!empty($centerIds)) {
+            return $query->whereHas('center', function (Builder $query2) use ($centerIds){
+                $query2->whereIn('centro.ID', $centerIds);
+            });
+        }
+
+        return $query;
+    }
+
+    /**
+     * Method scopeCenter
+     *
+     * @param $query $query [explicite description]
+     * @param Int $centerId [explicite description]
+     *
+     * @return void
+     */
+    public function scopeCenter($query, Int $centerId = null)
+    {
+        if ($centerId) {
+            return $query->where('IDCENTRO', $centerId);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Scope a query to only include users with client role.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeName($query, String $name = null)
+    {
+        if ($name) {
+            return $query->where(DB::raw("CONCAT(usuario.NOMBRE, ' ', usuario.APELLIDO1, ' ', usuario.APELLIDO2)"), 'like', "%$name%");
+        }
+
+        return $query;
+    }
+
+
+    /**
+     * Method scopeEmailAndPhone
+     *
+     * @param $query $query [explicite description]
+     * @param String $search [explicite description]
+     *
+     * @return void
+     */
+    public function scopeEmailAndPhone($query, String $search = null)
+    {
+        if ($search) {
+            return $query->where('EMAIL', 'like', "%$search%")
+                        ->orWhere('TELEFONO1', 'like', "%$search%")
+                        ->orWhere('TELEFONO2', 'like', "%$search%");
+        }
+
+        return $query;
+    }
+
+    /**
+     * Method center
+     *
+     * @return BelongsTo
      */
     public function center(): BelongsTo
     {
@@ -120,7 +194,7 @@ class User extends Authenticatable
     /**
      * Method activePasswordIndex
      *
-     * @return void
+     * @return String or null $activePasswordIndex
      */
     public function activePasswordIndex()
     {

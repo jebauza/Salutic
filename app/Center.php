@@ -13,6 +13,11 @@ class Center extends Model
 
     public $timestamps = false;
 
+    const CENTRO_SUR_ID = 1;
+    const CENTRO_NORTE_ID = 2;
+    const CENTRO_ESTE_ID = 3;
+    const CENTRO_OESTE_ID = 4;
+
     // SCOPE
     /**
      * Method scopeActive

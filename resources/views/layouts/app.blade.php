@@ -9,8 +9,8 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -18,6 +18,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
+    @yield('css')
 </head>
 <body>
     <div id="app">
@@ -33,6 +35,14 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav mr-auto">
+                        @auth()
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm mt-1" href="{{ route('view1.index') }}" role="button">Vista 1</a>
+                            </li>
+                            <li class="nav-item ml-md-2">
+                                <a class="btn btn-success btn-sm mt-1" href="{{ route('view2.index') }}" role="button">Vista 2</a>
+                            </li>
+                        @endauth
 
                     </ul>
 
@@ -80,5 +90,10 @@
             @yield('content')
         </main>
     </div>
+
+    <!-- Scripts -->
+    <script src="{{ asset('js/app.js') }}"></script>
+
+    @yield('script')
 </body>
 </html>
