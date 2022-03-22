@@ -2,13 +2,20 @@
 
 namespace App;
 
+use App\Center;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use Notifiable;
+
+    protected $table = 'usuario';
+    protected $key = 'ID';
+
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +23,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'EMAIL',
+        'NOMBRE',
+        'APELLIDO1',
+        'APELLIDO2',
+        'TELEFONO1',
+        'TELEFONO2',
     ];
 
     /**
@@ -25,7 +37,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'PASSWORD',
+        'PASSWORD2',
+        'PASSWORD3',
+        'PASSWORD4',
+        'PASSWORD5',
     ];
 
     /**
@@ -34,6 +50,16 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+
     ];
+
+    /**
+     * Get the user that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function center(): BelongsTo
+    {
+        return $this->belongsTo(Center::class, 'IDCENTRO', 'ID');
+    }
 }

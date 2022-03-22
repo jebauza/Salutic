@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use App\Center;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
@@ -41,32 +46,67 @@ class RegisterController extends Controller
     }
 
     /**
-     * Get a validator for an incoming registration request.
+     * Show the application registration form.
      *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return \Illuminate\Http\Response
      */
-    protected function validator(array $data)
+    public function showRegistrationForm()
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        $centers = Center::active()
+                            ->orderBy('NOMBRE')
+                            ->get();
+
+        return view('auth.register', compact('centers'));
     }
 
     /**
-     * Create a new user instance after a valid registration.
+     * Handle a registration request for the application.
      *
-     * @param  array  $data
-     * @return \App\User
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    protected function create(array $data)
+    public function register(Request $request)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+        $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'last_name1' => ['required', 'string', 'max:100'],
+            'last_name2' => ['required', 'string', 'max:100'],
+            'phone1' => ['required', 'string', 'max:100'],
+            'phone2' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'string', 'email', 'max:100', 'unique:usuario,EMAIL'],
+            'center' => ['required', 'integer', 'exists:centro,ID,ACTIVO,1'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+
+        try {
+            DB::beginTransaction();
+
+            $user = new User();
+            $user->EMAIL = $request->email;
+            $user->NOMBRE = $request->name;
+            $user->APELLIDO1 = $request->last_name1;
+            $user->APELLIDO2 = $request->last_name2;
+            $user->TELEFONO1 = $request->phone1;
+            $user->TELEFONO2 = $request->phone2;
+            $user->PASSWORD = Hash::make($request->password);
+            $user->ACTIVO = true;
+            $user->INDEXPASSWORD = 1;
+            $user->FECHAMODIFICACIONPASSWORD = Carbon::now();
+            $user->NUMERO_INTENTOS = 0;
+            $user->NUEVO = true;
+            $user->IDCENTRO = $request->center;
+
+            $user->save();
+            DB::commit();
+            event(new Registered($user));
+            $this->guard()->login($user);
+
+            return $this->registered($request, $user)
+                        ?: redirect($this->redirectPath());
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect('register')->withInput()->with('message-error', $e->getMessage());
+        }
     }
 }
