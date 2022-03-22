@@ -40,7 +40,7 @@
                                 <a class="btn btn-primary btn-sm mt-1" href="{{ route('view1.index') }}" role="button">Vista 1</a>
                             </li>
                             <li class="nav-item ml-md-2">
-                                <a class="btn btn-success btn-sm mt-1" href="#" role="button">Vista 2</a>
+                                <a class="btn btn-success btn-sm mt-1" href="{{ route('view2.index') }}" role="button">Vista 2</a>
                             </li>
                         @endauth
 

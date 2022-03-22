@@ -21,6 +21,7 @@ window.Swal = Swal;
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('view1', require('./components/View1Component.vue').default);
+Vue.component('view2', require('./components/View2Component.vue').default);
 
 const app = new Vue({
     el: '#app',

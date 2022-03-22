@@ -33,7 +33,9 @@ class View1Controller extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Method usersAjax
+     *
+     * @param Request $request [explicite description]
      *
      * @return \Illuminate\Http\Response
      */
@@ -43,29 +45,37 @@ class View1Controller extends Controller
                         ->name($request->name)
                         ->center($request->center)
                         ->with('center')
+                        ->orderBy('NOMBRE')
+                        ->orderBy('APELLIDO1')
+                        ->orderBy('APELLIDO2')
                         ->get();
 
         return $this->sendResponse(null, $users);
     }
 
     /**
-     * Display a listing of the resource.
+     * Method centersAjax
      *
      * @return \Illuminate\Http\Response
      */
     public function centersAjax()
     {
-        $centers = Center::whereIn('ID', $this->centerIds)->get();
+        $centers = Center::whereIn('ID', $this->centerIds)
+                            ->orderBy('NOMBRE')
+                            ->get();
 
         return $this->sendResponse(null, $centers);
     }
 
     /**
-     * Display a listing of the resource.
+     * Method destroyUserAjax
+     *
+     * @param Request $request [explicite description]
+     * @param $userId $userId [explicite description]
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroyUserAjax(Request $request, $userId)
+    public function destroyUserAjax($userId)
     {
         $user = User::centers($this->centerIds)
                     ->center(Center::CENTRO_NORTE_ID)
@@ -83,71 +93,5 @@ class View1Controller extends Controller
             DB::rollBack();
             return $this->sendError($e->getMessage(), null, 500);
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

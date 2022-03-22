@@ -74,10 +74,10 @@ class User extends Authenticatable
 
     // SCOPE
     /**
-     * Method scopeNameCenters
+     * Method scopeCenters
      *
      * @param $query $query [explicite description]
-     * @param Array $centers [explicite description]
+     * @param Array $centerIds [explicite description]
      *
      * @return void
      */
@@ -96,7 +96,7 @@ class User extends Authenticatable
      * Method scopeCenter
      *
      * @param $query $query [explicite description]
-     * @param Integer $centerId [explicite description]
+     * @param Int $centerId [explicite description]
      *
      * @return void
      */
@@ -107,16 +107,6 @@ class User extends Authenticatable
         }
 
         return $query;
-    }
-
-    /**
-     * Get the user that owns the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function center(): BelongsTo
-    {
-        return $this->belongsTo(Center::class, 'IDCENTRO', 'ID');
     }
 
     /**
@@ -132,6 +122,36 @@ class User extends Authenticatable
         }
 
         return $query;
+    }
+
+
+    /**
+     * Method scopeEmailAndPhone
+     *
+     * @param $query $query [explicite description]
+     * @param String $search [explicite description]
+     *
+     * @return void
+     */
+    public function scopeEmailAndPhone($query, String $search = null)
+    {
+        if ($search) {
+            return $query->where('EMAIL', 'like', "%$search%")
+                        ->orWhere('TELEFONO1', 'like', "%$search%")
+                        ->orWhere('TELEFONO2', 'like', "%$search%");
+        }
+
+        return $query;
+    }
+
+    /**
+     * Method center
+     *
+     * @return BelongsTo
+     */
+    public function center(): BelongsTo
+    {
+        return $this->belongsTo(Center::class, 'IDCENTRO', 'ID');
     }
 
     /**
@@ -174,7 +194,7 @@ class User extends Authenticatable
     /**
      * Method activePasswordIndex
      *
-     * @return void
+     * @return String or null $activePasswordIndex
      */
     public function activePasswordIndex()
     {
